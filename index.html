@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Event Registration</title>
+    <style>
+        body {
+            font-family: 'Segoe UI',
+            sans-serif;
+            background: linear-gradient(135deg, #8bddf2 0%, #01151b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+       
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 400px;
+        }
+       
+        h2 {
+            color: black;
+        }
+       
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+       
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+       
+        .btn-reg {
+            background-color: #007bff;
+            color: white;
+        }
+       
+        .btn-dl {
+            background-color: #28a745;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-admin {
+            width: auto; /* Don't make it full width */
+            padding: 8px 15px;
+            background-color: transparent;
+            color: #666;
+            border: 1px solid #ccc;
+            font-size: 12px;
+            margin-bottom: 20px;
+            /* align-self: flex-end; /* Pushes it to the right if using flex-column */
+        }
+
+        .btn-admin:hover {
+            background-color: #f0f0f0;
+            color: #333;
+            border-color: #999;
+        }
+       
+        /* QR Hover Effect  */
+        .qr-section { position: relative;
+            display: inline-block;
+            margin-top: 20px;
+        }
+       
+        .tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            font-size: 14px;
+        }
+       
+        .qr-section:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        #qrResult {
+            background-color: white; 
+            padding: 20px; /* This "Quiet Zone" is CRITICAL for Google Lens */
+            border: 1px solid #ccc;
+            image-rendering: pixelated; /* Keeps the edges sharp on high-res screens */
+        }
+       
+        #successView {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="registerView">
+        <h2>Event Registration</h2>
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="text" id="email" placeholder="Email" required>
+        <input type="text" id="phone" placeholder="Phone" required>
+        <input type="text" id="eventName" placeholder="Event Name" required>
+        <button class="btn-reg" onclick="registerUser()">Register</button>
+    </div>
+
+    <div id="successView">
+        <h2 style="color: #28a745;">Registration Successful!</h2>
+        <div class="qr-section">
+            <img id="qrResult" width="200" alt="Registration QR">
+            <div class="tooltip" id="qrTooltip"></div>
+        </div>
+        <button class="btn-dl" onclick="downloadReceipt()">Download PDF Receipt</button>
+    </div>
+    <div style="text-align: center; width: 100%; padding-top: 20px">
+        <button class="btn-admin" onclick="goToAdmin()">Admin</button>
+    </div>
+</div>
+
+<script>
+    let userData = {};
+
+    function goToAdmin() {
+        // For now, it can just alert or redirect
+        const password = prompt("Please enter admin password:");
+        if (password === "admin123") {
+            window.location.href = "admin.html"; // Redirect to your admin page
+        } else {
+            alert("Access Denied");
+        }
+    }
+    async function registerUser() {
+        const name = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const event = document.getElementById('eventName').value;
+
+        if (!name || !event) return alert("Please enter both Name and Event.");
+
+        const response = await fetch('http://127.0.0.1:5000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ full_name: name, email: email, phone: phone, event_name: event })
+        });
+        userData = await response.json();
+       
+        document.getElementById('registerView').style.display = 'none';
+        document.getElementById('successView').style.display = 'block';
+        document.getElementById('qrResult').src = "data:image/png;base64," + userData.qr_code;
+        document.getElementById('qrTooltip').innerHTML = `<strong>Registration Details:</strong><br>User: ${userData.name}<br>Event: ${userData.event}`;
+    }
+
+    async function downloadReceipt() {
+        const response = await fetch('http://127.0.0.1:5000/download_receipt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = `Receipt_${userData.name}.pdf`;
+        link.click();
+    }
+</script>
+
+</body>
+</html>

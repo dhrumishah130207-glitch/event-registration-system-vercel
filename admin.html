@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Event Registrations</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f7f6;
+            padding: 40px;
+        }
+        .admin-container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background-color: #007bff; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <a href="index.html" class="back-btn">← Back to Registration</a>
+    <h2>Registered Participants</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Event</th>
+            </tr>
+        </thead>
+        <tbody id="registrationTable">
+            </tbody>
+    </table>
+</div>
+
+<script>
+    async function loadRegistrations() {
+        try {
+            // Replace this URL with your actual backend endpoint
+            const response = await fetch('http://127.0.0.1:5000/get_registrations');
+            const data = await response.json();
+            
+            const tableBody = document.getElementById('registrationTable');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            // Inside your admin.html <script>
+            data.forEach(user => {
+                const row = `<tr>
+                    <td>${user.full_name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.event_name}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+        catch (error) {
+            console.error("Error loading data:", error);
+            document.getElementById('registrationTable').innerHTML = '<tr><td colspan="4">Error loading data. Is the backend running?</td></tr>';
+        }
+    }
+
+    // Load data automatically when the page opens
+    window.onload = loadRegistrations;
+</script>
+
+</body>
+</html>
