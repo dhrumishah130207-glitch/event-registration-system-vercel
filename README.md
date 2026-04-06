@@ -1,4 +1,4 @@
-# 🎉 Event Registration System
+# Event Registration System
 
 This is a web-based event registration system built using:
 
@@ -8,7 +8,7 @@ This is a web-based event registration system built using:
 
 ---
 
-## 🚀 Features
+## Features
 
 - User registration form
 - QR code generation
@@ -17,25 +17,25 @@ This is a web-based event registration system built using:
 
 ---
 
-## 🛠️ How to Run
+## How to Run
 
-### 1. Install dependencies
+### Install dependencies
 pip install -r requirements.txt
 
-### 2. Run backend
+### Run backend
 python app.py
 
-### 3. Open frontend
+### Open frontend
 Open index.html in browser
 
 ---
 
-## ⚠️ Note
+## Note
 Make sure MySQL is running and configured properly.
 
 ---
 
-## 📂 Files
+## Files
 
 - index.html → Registration page  
 - admin.html → Admin panel  
@@ -43,5 +43,6 @@ Make sure MySQL is running and configured properly.
 
 ---
 
-## 👨‍💻 Author
+## Author
 Dhrumi Shah
+Dbankita Biswas
